@@ -4,6 +4,10 @@
 
 #include "buffer.hpp"
 
+#include <fstream>
+#include <optional>
+#include <string>
+
 //
 //
 
@@ -89,7 +93,7 @@ std::optional<std::string> TBuffer::save(const std::string &fn)
 //
 //
 
-void TBuffer::insert(const int row, const int col, const char c)
+void TBuffer::insert(const int row, const int col, char c)
 {
     if (row >= 0 && row < static_cast<int>(lines.size()) && col >= 0 &&
         col <= static_cast<int>(lines.at(row).length()))
@@ -114,7 +118,7 @@ void TBuffer::insert(const int row, const std::string &s)
 {
     if (row >= 0 && row <= static_cast<int>(lines.size()))
     {
-        lines.insert(lines.begin() + row, line);
+        lines.insert(lines.begin() + row, s);
     }
 }
 
@@ -134,7 +138,7 @@ void TBuffer::join(const int row)
     if (row >= 0 && row < static_cast<int>(lines.size()) - 1)
     {
         lines.at(row) += lines.at(row + 1);
-        deleteLine(row + 1);
+        remove(row + 1);
     }
 }
 
@@ -145,7 +149,7 @@ void TBuffer::split(const int row, const int col)
     {
         std::string new_l = lines.at(row).substr(col);
         lines.at(row).erase(col);
-        insertLine(row + 1, new_l);
+        insert(row + 1, new_l);
     }
 }
 
@@ -183,7 +187,7 @@ int TBuffer::getSize() const
 //
 //
 
-void TBuffer::scroll(const Scroll d)
+void TBuffer::scroll(Scroll d)
 {
     if (d == Scroll::UP)
     {

@@ -29,10 +29,10 @@ UnixPl::~UnixPl()
 
 void UnixPl::init()
 {
-    if (is_initialized)
-    {
-        return;
-    }
+    // if (is_initialized)
+    // {
+    //     return;
+    // }
     if (tcgetattr(STDIN_FILENO, &orig) == -1)
     {
         Pl::draw("\x1b[91mFatal error\x1b[0m: unable to initialize editor! Error code: 1.");
@@ -90,7 +90,7 @@ void UnixPl::getWinsize(int &width, int &height)
     {
         // default value if failed getting terminal window size
         width = 80;
-        col = 24;
+        height = 24;
     }
     else
     {

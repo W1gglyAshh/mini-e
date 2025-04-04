@@ -45,11 +45,11 @@ class TBuffer
     void insert(int row, int col, char c);
     void remove(int row, int col);
 
-    void insert(int row, int col, const std::string &s);
+    void insert(int row, const std::string &s);
     void remove(int row);
 
     void join(int row);
-    void split(int row, int col)
+    void split(int row, int col);
 
     void scroll(Scroll d);
 
@@ -57,9 +57,10 @@ class TBuffer
     [[nodiscard]] const std::string &getLine(int row) const;
     [[nodiscard]] int getLineLength(int row) const;
     [[nodiscard]] int getLineCount() const;
+    [[nodiscard]] int getSize() const;
 
-    [[nodiscard]] int getHorizontalOffset() const;
-    [[nodiscard]] int getVerticalOffset() const;
+    [[nodiscard]] int getHorizontalOffset() const { return h_offset; }
+    [[nodiscard]] int getVerticalOffset() const { return v_offset; }
 };
 
 //

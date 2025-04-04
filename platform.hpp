@@ -22,8 +22,7 @@ class Pl
     virtual void getWinsize(int &width, int &height) = 0;
     virtual void setCursorPos(int row, int col) = 0;
 
-    static std::unique_ptr<Pl> createPlInstance()
-    
+    static std::unique_ptr<Pl> createPlInstance();
 };
 
 //
@@ -49,7 +48,7 @@ class UnixPl : public Pl
 
     void getWinsize(int &width, int &height) override;
     void setCursorPos(int row, int col) override;
-}
+};
 
 #elif defined(_WIN32) || defined(_WIN64)
 
@@ -58,7 +57,7 @@ class UnixPl : public Pl
 #endif
 
 // create a pointer pointing to the correct platform child class
-inline static std::unique_ptr<Pl> createPlInstance()
+inline std::unique_ptr<Pl> Pl::createPlInstance()
 {
 #if defined(__unix__) || defined(__APPLE__)
         return std::make_unique<UnixPl>();
