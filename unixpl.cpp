@@ -11,7 +11,7 @@
 #include <termios.h>
 #include <cstdio>
 #include <sys/ioctl.h>
-#include <cstring>
+#include <string>
 #include <cstdlib>
 
 UnixPl::UnixPl() : is_initialized(false)
@@ -35,9 +35,7 @@ void UnixPl::init()
     }
     if (tcgetattr(STDIN_FILENO, &orig) == -1)
     {
-        const char *err = 
-            "\x1b[91mFatal error\x1b[0m: unable to initialize editor!\nError code: 1. Please view the documentation on GitHub for more information\n";
-        write(STDOUT_FILENO, err, strlen(err));
+        Pl::draw("\x1b[91mFatal error\x1b[0m: unable to initialize editor! Error code: 1.");
         exit(EXIT_FAILURE);
     }
 
@@ -51,7 +49,64 @@ void UnixPl::init()
 
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
     {
-    }        
+        Pl::draw("\x1b[91mFatal error\x1b[0m: unable to initialize edtior! Error code: 2.");
+        exit(EXIT_FAILURE);
+    }
+
+    // enable alternate screen buffer
+    Pl::draw("\x1b[?1049h");
+    // enable mouse support
+    Pl::draw("\x1b[1000h\x1b[1002h\x1b[1006h\x1b[1007h");
+
+    is_initialized = true;
+}
+
+//
+//
+
+void UnixPl::cleanup()
+{
+    if (!is_initialized)
+    {
+        return;
+    }
+
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig);
+
+    Pl::draw("\x1b[?1049l");
+    Pl::draw("\x1b[1000l\x1b[1002l\x1b[1006l\x1b[1007l");
+
+    is_initialized = false;
+}
+
+//
+//
+
+void UnixPl::getWinsize(int &width, int &height)
+{
+    struct winsize ws;
+
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) != 0 || ws.ws_col == 0)
+    {
+        // default value if failed getting terminal window size
+        width = 80;
+        col = 24;
+    }
+    else
+    {
+        width = ws.ws_col;
+        height = ws.ws_row;
+    }
+}
+
+//
+//
+
+void UnixPl::setCursorPos(int row, int col)
+{
+    // 1 based
+    Pl::draw("\x1b[" + std::to_string(row + 1) + ";" + std::to_string(col + 1) + "H");
 }
 
 #endif
+
