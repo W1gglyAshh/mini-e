@@ -7,6 +7,7 @@
 int main(int argc, char **argv)
 {
     std::unique_ptr<Pl> pl = Pl::createPlInstance();
+    pl->init();
 
     int w, h;
     pl->getWinsize(w, h);

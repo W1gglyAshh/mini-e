@@ -3,7 +3,7 @@
 //
 
 // won't be compiled if aren't on the correct platform
-#if defined(__unix__) || (__APPLE__)
+#if defined(__unix__) || defined(__APPLE__)
 
 #include "platform.hpp"
 
@@ -16,7 +16,7 @@
 
 UnixPl::UnixPl() : is_initialized(false)
 {
-    init();
+    memset(&orig, 0, sizeof(orig));
 }
 
 UnixPl::~UnixPl()
@@ -29,10 +29,19 @@ UnixPl::~UnixPl()
 
 void UnixPl::init()
 {
-    // if (is_initialized)
-    // {
-    //     return;
-    // }
+    Pl::draw("Init called");
+    if (is_initialized)
+    {
+        Pl::draw("Checking reinit");
+        return;
+    }
+    Pl::draw("Getting terminal state");
+
+    if (!isatty(STDIN_FILENO))
+    {
+        Pl::draw("\x1b[91mFatal error\x1b[0m: stdin is not a terminal device.");
+        exit(EXIT_FAILURE);
+    }
     if (tcgetattr(STDIN_FILENO, &orig) == -1)
     {
         Pl::draw("\x1b[91mFatal error\x1b[0m: unable to initialize editor! Error code: 1.");
